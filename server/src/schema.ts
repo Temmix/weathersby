@@ -3,6 +3,7 @@ import { gql } from "apollo-server";
 export const typeDefs = gql`
   type Query {
     tasks: [Task!]!
+    task(taskId: ID!): Task
   }
 
   type Mutation {

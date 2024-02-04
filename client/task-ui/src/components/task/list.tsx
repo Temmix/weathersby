@@ -25,30 +25,34 @@ const GET_TASKS = gql`
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
   { field: "title", headerName: "Title", width: 130 },
-  { field: "description", headerName: "Description", width: 130 },
+  { field: "description", headerName: "Description", width: 430 },
   { field: "completed", headerName: "Completed", width: 130 },
 ];
 
 export const List = () => {
   const navigate = useNavigate();
-  const { data, error, loading } = useQuery(GET_TASKS);
+  const { data, error, loading } = useQuery(GET_TASKS, {
+    fetchPolicy: "no-cache",
+  });
 
   if (error)
     return (
       <Box m={3} pt={5} padding={10}>
         <Alert variant='standard' severity='error'>
-          This is a filled error Alert.
+          Please try again later
         </Alert>
       </Box>
     );
 
   if (loading) return <LinearProgress color='inherit' />;
+
   const handleRowClick = (
     params: GridRowParams,
     _event: MuiEvent<React.MouseEvent<HTMLElement>>,
     _details: GridCallbackDetails
   ) => {
-    console.log({ params });
+    const { id } = params;
+    navigate(`/tasks/${id}`);
   };
 
   const handleNavigation = (event: React.MouseEvent<HTMLElement>) => {

@@ -63,7 +63,7 @@ export const Mutation = {
   ): Promise<TaskPayloadType> => {
     const { taskId, title, description, completed } = args;
     const { prisma } = context;
-    if (!title && !description && !completed) {
+    if (!title && !description) {
       return {
         taskErrors: [
           {
@@ -95,7 +95,7 @@ export const Mutation = {
       data: {
         title: !title ? existingTask.title : title,
         description: !description ? existingTask.description : description,
-        completed: !completed ? existingTask.completed : completed,
+        completed: completed,
       },
       where: {
         id: Number(taskId),

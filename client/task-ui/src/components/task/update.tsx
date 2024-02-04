@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -7,17 +7,32 @@ import {
   Box,
   FormControlLabel,
   Checkbox,
+  LinearProgress,
+  Alert,
 } from "@mui/material";
 
-import { useMutation, gql } from "@apollo/client";
+import { useMutation, gql, useQuery } from "@apollo/client";
 
-const CREATE_TASK = gql`
-  mutation TaskCreate(
+const GET_TASK = gql`
+  query Task($taskId: ID!) {
+    task(taskId: $taskId) {
+      id
+      title
+      description
+      completed
+    }
+  }
+`;
+
+const UPDATE_TASK = gql`
+  mutation TaskUpdate(
+    $taskId: ID!
     $title: String!
     $description: String!
     $completed: Boolean!
   ) {
-    taskCreate(
+    taskUpdate(
+      taskId: $taskId
       title: $title
       description: $description
       completed: $completed
@@ -33,43 +48,65 @@ const CREATE_TASK = gql`
   }
 `;
 
-export const CreateTask = () => {
+export const UpdateTask = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [completed, setCompleted] = useState(false);
-  const [taskCreate] = useMutation(CREATE_TASK);
+
+  const [taskUpdate] = useMutation(UPDATE_TASK);
+  const { id } = useParams();
+
+  const { data, error, loading } = useQuery(GET_TASK, {
+    fetchPolicy: "no-cache",
+    variables: { taskId: id },
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCompleted(event.target.checked);
   };
 
-  function HandleSubmit(event: any) {
+  useEffect(() => {
+    if (data && data.task !== null) {
+      const { task } = data;
+      setTitle(task.title);
+      setDescription(task.description);
+      setCompleted(task.completed);
+    }
+  }, [data]);
+
+  const HandleSubmit = (event: any) => {
     event.preventDefault();
 
-    taskCreate({
+    taskUpdate({
       variables: {
+        taskId: id,
         title: title,
         description: description,
         completed: completed,
       },
     });
-
-    resetForm();
-  }
-
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setCompleted(false);
+    // navigate to home page
+    navigate("/tasks");
   };
+
+  if (error || data?.task === null)
+    return (
+      <Box m={3} pt={5} padding={10}>
+        <Alert variant='standard' severity='error'>
+          Please try again later
+        </Alert>
+      </Box>
+    );
+
+  if (loading) return <LinearProgress color='inherit' />;
 
   return (
     <React.Fragment>
       <div style={{ height: 400, width: "60%" }}>
         <form onSubmit={HandleSubmit}>
           <Box m={3} pt={5} padding={10}>
-            <h2>Create Task Form</h2>
+            <h2>Update Task Form</h2>
             <Stack spacing={2} direction='row' sx={{ marginBottom: 4 }}>
               <TextField
                 type='text'
