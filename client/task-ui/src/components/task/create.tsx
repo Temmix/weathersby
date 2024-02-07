@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TextField,
@@ -11,7 +11,7 @@ import {
 
 import { useMutation, gql } from "@apollo/client";
 
-const CREATE_TASK = gql`
+export const CREATE_TASK = gql`
   mutation TaskCreate(
     $title: String!
     $description: String!
@@ -65,7 +65,7 @@ export const CreateTask = () => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <div style={{ height: 400, width: "60%" }}>
         <form onSubmit={HandleSubmit}>
           <Box m={3} pt={5} padding={10}>
@@ -124,6 +124,6 @@ export const CreateTask = () => {
           </Box>
         </form>
       </div>
-    </React.Fragment>
+    </>
   );
 };

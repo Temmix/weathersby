@@ -10,7 +10,7 @@ import {
 import { Alert, Box, Button, LinearProgress } from "@mui/material";
 import { gql, useQuery } from "@apollo/client";
 
-const GET_TASKS = gql`
+export const GET_TASKS = gql`
   query {
     tasks {
       id

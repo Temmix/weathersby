@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   TextField,
@@ -102,7 +102,7 @@ export const UpdateTask = () => {
   if (loading) return <LinearProgress color='inherit' />;
 
   return (
-    <React.Fragment>
+    <>
       <div style={{ height: 400, width: "60%" }}>
         <form onSubmit={HandleSubmit}>
           <Box m={3} pt={5} padding={10}>
@@ -161,6 +161,6 @@ export const UpdateTask = () => {
           </Box>
         </form>
       </div>
-    </React.Fragment>
+    </>
   );
 };
