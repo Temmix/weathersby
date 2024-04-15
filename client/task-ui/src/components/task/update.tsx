@@ -48,6 +48,20 @@ const UPDATE_TASK = gql`
   }
 `;
 
+const DELETE_TASK = gql`
+  mutation TaskDelete($taskId: ID!) {
+    taskDelete(taskId: $taskId) {
+      taskErrors {
+        message
+      }
+      task {
+        title
+        description
+      }
+    }
+  }
+`;
+
 export const UpdateTask = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -55,6 +69,7 @@ export const UpdateTask = () => {
   const [completed, setCompleted] = useState(false);
 
   const [taskUpdate] = useMutation(UPDATE_TASK);
+  const [taskDelete] = useMutation(DELETE_TASK);
   const { id } = useParams();
 
   const { data, error, loading } = useQuery(GET_TASK, {
@@ -87,7 +102,12 @@ export const UpdateTask = () => {
       },
     });
     // navigate to home page
-    navigate("/tasks");
+    navigate("/");
+  };
+
+  const handleDelete = async () => {
+    await taskDelete({ variables: { taskId: id } });
+    navigate("/");
   };
 
   if (error || data?.task === null)
@@ -152,9 +172,18 @@ export const UpdateTask = () => {
             </Button>
             <Button
               variant='outlined'
+              color='error'
+              type='button'
+              onClick={handleDelete}
+              style={{ marginRight: "12px" }}
+            >
+              Delete
+            </Button>
+            <Button
+              variant='outlined'
               color='primary'
               type='button'
-              onClick={() => navigate("/tasks")}
+              onClick={() => navigate("/")}
             >
               Back
             </Button>

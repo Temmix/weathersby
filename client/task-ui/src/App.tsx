@@ -8,9 +8,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/tasks' element={<List />} />
-        <Route path='/tasks/create' element={<CreateTask />} />
+        <Route path='/' element={<List />} />
         <Route path='/tasks/:id' element={<UpdateTask />} />
+        <Route path='/tasks/create' element={<CreateTask />} />
       </Routes>
     </Router>
   );

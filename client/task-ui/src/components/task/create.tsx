@@ -117,7 +117,7 @@ export const CreateTask = () => {
               variant='outlined'
               color='primary'
               type='button'
-              onClick={() => navigate("/tasks")}
+              onClick={() => navigate("/")}
             >
               Back
             </Button>

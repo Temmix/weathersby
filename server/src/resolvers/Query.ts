@@ -10,7 +10,7 @@ export const Query = {
     return prisma.task.findMany({
       orderBy: [
         {
-          createdAt: "asc",
+          createdAt: "desc",
         },
         // {  title: 'asc' }
       ],
