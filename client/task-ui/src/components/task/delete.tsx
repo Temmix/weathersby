@@ -13,7 +13,7 @@ import {
 
 import { useMutation, gql, useQuery } from "@apollo/client";
 
-export const GET_TASK = gql`
+const GET_TASK = gql`
   query Task($taskId: ID!) {
     task(taskId: $taskId) {
       id
@@ -24,31 +24,7 @@ export const GET_TASK = gql`
   }
 `;
 
-export const UPDATE_TASK = gql`
-  mutation TaskUpdate(
-    $taskId: ID!
-    $title: String!
-    $description: String!
-    $completed: Boolean!
-  ) {
-    taskUpdate(
-      taskId: $taskId
-      title: $title
-      description: $description
-      completed: $completed
-    ) {
-      taskErrors {
-        message
-      }
-      task {
-        title
-        description
-      }
-    }
-  }
-`;
-
-export const DELETE_TASK = gql`
+const DELETE_TASK = gql`
   mutation TaskDelete($taskId: ID!) {
     taskDelete(taskId: $taskId) {
       taskErrors {
@@ -62,13 +38,12 @@ export const DELETE_TASK = gql`
   }
 `;
 
-export const UpdateTask = () => {
+export const DeleteTask = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [completed, setCompleted] = useState(false);
 
-  const [taskUpdate] = useMutation(UPDATE_TASK);
   const [taskDelete] = useMutation(DELETE_TASK);
   const { id } = useParams();
 
@@ -90,21 +65,6 @@ export const UpdateTask = () => {
     }
   }, [data]);
 
-  const HandleSubmit = (event: any) => {
-    event.preventDefault();
-
-    taskUpdate({
-      variables: {
-        taskId: id,
-        title: title,
-        description: description,
-        completed: completed,
-      },
-    });
-    // navigate to home page
-    navigate("/");
-  };
-
   const handleDelete = async () => {
     await taskDelete({ variables: { taskId: id } });
     navigate("/");
@@ -124,7 +84,7 @@ export const UpdateTask = () => {
   return (
     <>
       <div style={{ height: 400, width: "60%" }}>
-        <form onSubmit={HandleSubmit}>
+        <form>
           <Box m={3} pt={5} padding={10}>
             <h2>Update Task Form</h2>
             <Stack spacing={2} direction='row' sx={{ marginBottom: 4 }}>
@@ -161,21 +121,13 @@ export const UpdateTask = () => {
                 }
               />
             </Box>
-            <Button
-              disabled={!title || !description}
-              variant='outlined'
-              color='primary'
-              type='submit'
-              style={{ marginRight: "12px" }}
-            >
-              Submit
-            </Button>
+
             <Button
               variant='outlined'
               color='error'
               type='button'
               onClick={handleDelete}
-              style={{ marginRight: "12px" }}
+              style={{ marginLeft: "12px" }}
             >
               Delete
             </Button>

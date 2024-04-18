@@ -1,38 +1,85 @@
-import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { MockedProvider } from "@apollo/client/testing";
+import React from "react";
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import { CreateTask, CREATE_TASK } from "./create";
+import { MockedProvider } from "@apollo/client/testing";
 
+// Mock useNavigate hook
 jest.mock("react-router-dom", () => ({
-  ...(jest.requireActual("react-router-dom") as any),
   useNavigate: () => jest.fn(),
 }));
 
-describe("<CreateTask />", () => {
-  it("should render success states on create", async () => {
-    const task = {
-      title: "First title",
-      description: "Cool description",
-      completed: false,
-    };
-    const mocks = [
-      {
-        request: {
-          query: CREATE_TASK,
-          variables: task,
-        },
-        result: { data: task },
+// Define mocks for Apollo client
+const mocks = [
+  {
+    request: {
+      query: CREATE_TASK,
+      variables: {
+        title: "Test Title",
+        description: "Test Description",
+        completed: false,
       },
-    ];
+    },
+    result: {
+      data: {
+        taskCreate: {
+          taskErrors: [],
+          task: {
+            title: "Test Title",
+            description: "Test Description",
+          },
+        },
+      },
+    },
+  },
+];
 
+describe("CreateTask", () => {
+  it("renders the create task form", () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <CreateTask />
       </MockedProvider>
     );
 
-    // Find the button element...
-    const button = screen.getByText("Submit");
-    fireEvent.click(button); // Simulate a click and fire the mutation
+    expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/completed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Submit/i)).toBeInTheDocument();
+    expect(screen.getByText(/Back/i)).toBeInTheDocument();
+  });
+
+  it("submits the form with valid input", async () => {
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <CreateTask />
+      </MockedProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Title/i), {
+      target: { value: "Test Title" },
+    });
+    fireEvent.change(screen.getByLabelText(/Description/i), {
+      target: { value: "Test Description" },
+    });
+
+    fireEvent.click(screen.getByText(/Submit/i));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Back/i)).toBeInTheDocument();
+    });
+  });
+
+  it("does not submit the form with invalid input", async () => {
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <CreateTask />
+      </MockedProvider>
+    );
+
+    fireEvent.click(screen.getByText(/Submit/i));
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Submit/i)).toBeDisabled();
+    });
   });
 });
